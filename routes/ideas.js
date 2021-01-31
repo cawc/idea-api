@@ -13,6 +13,16 @@ router.get('/', async (req, res, next) => {
   }
 })
 
+router.get('/random', async (req, res, next) => {
+  try {
+    const items = await ideas.find()
+    const item = items[Math.floor(Math.random() * items.length)]
+    res.json(item)
+  } catch (error) {
+    next(error)
+  }
+})
+
 router.get('/:id', async (req, res, next) => {
   try {
     const { id } = req.params
