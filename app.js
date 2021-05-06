@@ -21,6 +21,7 @@ app.use(function (req, res, next) {
 // * routers
 const ideaRouter = require('./routes/ideas')
 const shortRouter = require('./routes/short')
+const authRouter = require('./routes/auth')
 
 app.use(bodyParser.json())
 
@@ -28,6 +29,7 @@ app.use(morgan('tiny'))
 
 app.use('/idea/', ideaRouter)
 app.use('/s/', shortRouter)
+app.use('/auth/', authRouter)
 
 const port = process.env.PORT || 9998
 app.listen(port, () => { console.log(`api now launched on port ${port} 🚀`) })

@@ -3,8 +3,9 @@ const router = express.Router()
 const db = require('../db')
 const ideaSchema = require('../idea-schema')
 const ideas = db.get('ideas')
+const utils = require('../utils')
 
-router.get('/', async (req, res, next) => {
+router.get('/', utils.authJWT, async (req, res, next) => {
   try {
     const items = await ideas.find()
     res.json(items)
@@ -13,7 +14,7 @@ router.get('/', async (req, res, next) => {
   }
 })
 
-router.get('/random', async (req, res, next) => {
+router.get('/random', utils.authJWT, async (req, res, next) => {
   try {
     const items = await ideas.find()
     const item = items[Math.floor(Math.random() * items.length)]
@@ -23,7 +24,7 @@ router.get('/random', async (req, res, next) => {
   }
 })
 
-router.get('/:id', async (req, res, next) => {
+router.get('/:id', utils.authJWT, async (req, res, next) => {
   try {
     const { id } = req.params
     const item = await ideas.find({ _id: id })
@@ -33,7 +34,7 @@ router.get('/:id', async (req, res, next) => {
   }
 })
 
-router.post('/', async (req, res, next) => {
+router.post('/', utils.authJWT, utils.adminOnly, async (req, res, next) => {
   try {
     const value = await ideaSchema.validateAsync(req.body)
     const item = await ideas.insert(value)
@@ -43,7 +44,7 @@ router.post('/', async (req, res, next) => {
   }
 })
 
-router.put('/:id', async (req, res, next) => {
+router.put('/:id', utils.authJWT, utils.adminOnly, async (req, res, next) => {
   try {
     const { id } = req.params
     const value = await ideaSchema.validateAsync(req.body)
@@ -56,7 +57,7 @@ router.put('/:id', async (req, res, next) => {
   }
 })
 
-router.delete('/:id', async (req, res, next) => {
+router.delete('/:id', utils.authJWT, utils.adminOnly, async (req, res, next) => {
   try {
     const { id } = req.params
     await ideas.remove({ _id: id })
