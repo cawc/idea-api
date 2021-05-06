@@ -1,7 +1,7 @@
 const express = require('express')
 const router = express.Router()
 const db = require('../db')
-const schema = require('../schema')
+const ideaSchema = require('../idea-schema')
 const ideas = db.get('ideas')
 
 router.get('/', async (req, res, next) => {
@@ -35,7 +35,7 @@ router.get('/:id', async (req, res, next) => {
 
 router.post('/', async (req, res, next) => {
   try {
-    const value = await schema.validateAsync(req.body)
+    const value = await ideaSchema.validateAsync(req.body)
     const item = await ideas.insert(value)
     res.json(item)
   } catch (error) {
@@ -46,7 +46,7 @@ router.post('/', async (req, res, next) => {
 router.put('/:id', async (req, res, next) => {
   try {
     const { id } = req.params
-    const value = await schema.validateAsync(req.body)
+    const value = await ideaSchema.validateAsync(req.body)
     const item = await ideas.findOne({ _id: id })
     if (!item) return next()
     await ideas.update({ _id: id }, { $set: value })
