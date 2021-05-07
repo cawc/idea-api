@@ -18,7 +18,6 @@ const authJWT = (req, res, next) => {
 }
 
 const adminOnly = (req, res, next) => {
-  console.log(req.user.role)
   if (req.user.role === 'admin') {
     next()
   } else {
