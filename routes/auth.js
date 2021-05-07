@@ -31,7 +31,7 @@ router.post('/authenticate', async (req, res, next) => {
         if (match) {
           const accessToken = jwt.sign({ username: user.username, role: user.role }, process.env.JWT_SECRET, { expiresIn: '30m' })
           const refreshToken = jwt.sign({ username: user.username, role: user.role }, process.env.JWT_REFRESH_SECRET)
-          await refreshTokens.insertOne({ userid: user._id, token: refreshToken })
+          await refreshTokens.insert({ userid: user._id, token: refreshToken })
           res.json({ accessToken, refreshToken })
         } else {
           res.status(401).send('Username/password incorrect')
