@@ -7,13 +7,13 @@ const authJWT = (req, res, next) => {
     const token = authHeader.split(' ')[1]
     jwt.verify(token, process.env.JWT_SECRET, (err, user) => {
       if (err) {
-        return res.sendStatus(403)
+        return res.status(403).json({ error: 'Token error' })
       }
       req.user = user
       next()
     })
   } else {
-    res.sendStatus(401)
+    res.status(401).json({ error: 'Not authenticated' })
   }
 }
 
@@ -21,7 +21,7 @@ const adminOnly = (req, res, next) => {
   if (req.user.role === 'admin') {
     next()
   } else {
-    res.sendStatus(403)
+    res.status(403).json({ error: 'Not authorized to view this page' })
   }
 }
 

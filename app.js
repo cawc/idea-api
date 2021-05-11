@@ -27,7 +27,7 @@ app.use(bodyParser.json())
 
 app.use(morgan('tiny'))
 
-app.use('/idea/', ideaRouter)
+app.use('/ideas/', ideaRouter)
 app.use('/s/', shortRouter)
 app.use('/auth/', authRouter)
 

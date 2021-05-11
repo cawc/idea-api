@@ -22,7 +22,7 @@ router.post('/authenticate', async (req, res, next) => {
     const { username, password } = req.body
     const user = await users.findOne({ username: username })
     if (!user) {
-      res.status(401).send('Username/password incorrect')
+      res.status(401).json({ error: 'Username/password incorrect' })
     } else {
       bcrypt.compare(password, user.passhash, async (err, match) => {
         if (err) {
@@ -34,7 +34,7 @@ router.post('/authenticate', async (req, res, next) => {
           await refreshTokens.insert({ userid: user._id, token: refreshToken })
           res.json({ accessToken, refreshToken })
         } else {
-          res.status(401).send('Username/password incorrect')
+          res.status(401).json({ error: 'Username/password incorrect' })
         }
       })
     }
@@ -45,11 +45,11 @@ router.post('/authenticate', async (req, res, next) => {
 
 router.post('/token', async (req, res, next) => {
   try {
-    const { token } = req.body
-    if (!token) res.sendStatus(401)
-    if (await refreshTokens.count({ token: token }) < 1) res.sendStatus(403)
+    const { refreshToken } = req.body
+    if (!refreshToken) res.status(401).json({ error: 'No refreshToken provided' })
+    if (await refreshTokens.count({ token: refreshToken }) < 1) res.status(403).json({ error: 'Invalid refreshToken' })
 
-    jwt.verify(token, process.env.JWT_REFRESH_SECRET, (err, user) => {
+    jwt.verify(refreshToken, process.env.JWT_REFRESH_SECRET, (err, user) => {
       if (err) {
         next(err)
       } else {
@@ -64,9 +64,9 @@ router.post('/token', async (req, res, next) => {
 
 router.post('/logout', utils.authJWT, async (req, res, next) => {
   try {
-    const { token } = req.body
-    await refreshTokens.remove({ token: token })
-    res.send('Logout success')
+    const { refreshToken } = req.body
+    await refreshTokens.remove({ token: refreshToken })
+    res.json({ message: 'Logout success' })
   } catch (error) {
     next(error)
   }
@@ -77,7 +77,7 @@ router.post('/register', utils.authJWT, utils.adminOnly, async (req, res, next) 
     let user = await userRegistrationSchema.validateAsync(req.body)
     const nameCheck = await users.findOne({ username: user.username })
     if (nameCheck) {
-      res.status(409).send('User with this username already exists')
+      res.status(409).json({ error: 'User with this username already exists' })
     } else {
       bcrypt.hash(user.password, 10, async (err, hash) => {
         if (err) {
